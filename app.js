@@ -40,6 +40,7 @@ authForm.addEventListener('submit', async (e) => {
         if (error) alert("Revisa tu correo para confirmar el registro");
     }
 });
+
 document.getElementById('logout-btn').onclick = () => supabase.auth.signOut();
 
 // --- 2. GESTIÓN DE TAREAS (CRUD) ---
@@ -135,7 +136,7 @@ async function loginConGitHub() {
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-            redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/AppTareas.html'
+            redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/'
         }
     });
 
@@ -145,5 +146,23 @@ async function loginConGitHub() {
 }
 
 // Escuchar el clic del nuevo botón
-
 document.getElementById('github-login').addEventListener('click', loginConGitHub);
+
+// Función para cerrar sesión
+async function cerrarSesion() {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+        console.error("Error al salir:", error.message);
+    } else {
+        console.log("Sesión cerrada correctamente");
+        // Esto recarga la página para que vuelvas al formulario de entrar
+        window.location.reload(); 
+    }
+}
+
+// Conectar el botón de salir con la función
+const botonSalir = document.getElementById('logout-btn');
+if (botonSalir) {
+    botonSalir.addEventListener('click', cerrarSesion);
+}
