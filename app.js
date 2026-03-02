@@ -40,10 +40,6 @@ authForm.addEventListener('submit', async (e) => {
         if (error) alert("Revisa tu correo para confirmar el registro");
     }
 });
-
-document.getElementById('google-login').onclick = () => 
-    supabase.auth.signInWithOAuth({ provider: 'google' });
-
 document.getElementById('logout-btn').onclick = () => supabase.auth.signOut();
 
 // --- 2. GESTIÓN DE TAREAS (CRUD) ---
@@ -139,7 +135,7 @@ async function loginConGitHub() {
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-            redirectTo: 'http://localhost:8000/AppTareas.html'
+            redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/AppTareas.html'
         }
     });
 
@@ -149,4 +145,5 @@ async function loginConGitHub() {
 }
 
 // Escuchar el clic del nuevo botón
+
 document.getElementById('github-login').addEventListener('click', loginConGitHub);
