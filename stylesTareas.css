@@ -31,21 +31,34 @@ gap: 1rem;
 margin-bottom: 1.5rem;
 }
 
+.auth-tabs {
+display: flex;
+gap: 12px;
+margin-bottom: 25px;
+}
+
 .auth-tabs button {
 flex: 1;
-padding: 0.5rem;
+padding: 12px;
 cursor: pointer;
 border: none;
-background: none;
-border-bottom: 2px solid transparent;
+background: #ffffff;
+color: #9b59b6;
 font-size: 1rem;
-transition: all 0.3s;
+font-weight: bold;
+border-radius: 10px;
+border: 2px solid #9b59b6;
+transition: all 0.3s ease;
 }
 
 .auth-tabs button.active {
-border-color: var(--primary);
-font-weight: bold;
-color: var(--primary);
+background: #9b59b6;
+color: white;
+box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+}
+
+.auth-tabs button:hover:not(.active) {
+background: #fdf2f8;
 }
 
 header {
