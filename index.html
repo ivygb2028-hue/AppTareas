@@ -12,25 +12,29 @@
 
     <div id="auth-section" class="auth-container">
         <div class="auth-tabs">
-    <span id="tab-login" class="active" onclick="switchAuth('login')">Entrar</span>
-    <span id="tab-signup" onclick="switchAuth('signup')">Registro</span>
-</div>
+            <span id="tab-login" class="active" onclick="switchAuth('login')">Entrar</span>
+            <span id="tab-signup" onclick="switchAuth('signup')">Registro</span>
+        </div>
+
         <form id="auth-form">
             <input type="email" id="auth-email" placeholder="Correo electrónico" required>
             <input type="password" id="auth-password" placeholder="Contraseña" required>
-            <button type="submit" id="auth-submit-btn" style="width: 100%;">Entrar</button>
+            <button type="submit" id="auth-submit-btn">Entrar</button>
         </form>
-        <button class="btn-github" id="github-login" style="background-color: #333; color: white; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
-    <i class="fab fa-github"></i> Continuar con GitHub
-</button>
+
+        <button class="btn-github" id="github-login">
+            <i class="fab fa-github"></i> Continuar con GitHub
+        </button>
     </div>
 
     <div id="app-section" class="hidden">
         <header>
-            <h2>Mis Tareas</h2>
-            <div>
+            <h2><i class="fas fa-tasks"></i> Mis Tareas</h2>
+            <div class="header-right">
                 <span id="user-display"></span>
-                <button class="btn-logout" id="logout-btn">Salir</button>
+                <button class="btn-logout" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
             </div>
         </header>
 
@@ -38,15 +42,26 @@
             <div class="task-input-card">
                 <input type="text" id="task-title" placeholder="¿Qué hay que hacer? (Título obligatorio)" required>
                 <textarea id="task-desc" placeholder="Descripción (opcional)"></textarea>
+                
+                <div class="date-group">
+                    <label for="task-deadline">
+                        <i class="far fa-calendar-alt"></i> Fecha límite:
+                    </label>
+                    <input type="date" id="task-deadline">
+                </div>
+
                 <button id="add-task-btn">Añadir Tarea</button>
             </div>
 
-            <input type="text" id="search-input" placeholder="🔍 Buscar por título...">
-            <div class="controls">
-                <div class="filters">
-                    <button class="active" data-filter="all">Todas</button>
-                    <button data-filter="pending">Pendientes</button>
-                    <button data-filter="completed">Completadas</button>
+            <div class="search-section">
+                <input type="text" id="search-input" placeholder="🔍 Buscar por título...">
+                
+                <div class="controls">
+                    <div class="filters">
+                        <button class="active" data-filter="all">Todas</button>
+                        <button data-filter="pending">Pendientes</button>
+                        <button data-filter="completed">Completadas</button>
+                    </div>
                 </div>
             </div>
 
