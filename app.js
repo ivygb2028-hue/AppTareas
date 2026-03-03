@@ -13,7 +13,6 @@ let currentFilter = 'all';
 
 // --- 1. GESTIÓN DE AUTENTICACIÓN ---
 
-// Escuchar cambios de sesión
 supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
         authSection.classList.add('hidden');
@@ -48,23 +47,29 @@ document.getElementById('logout-btn').onclick = () => supabase.auth.signOut();
 document.getElementById('add-task-btn').onclick = async () => {
     const title = document.getElementById('task-title').value;
     const description = document.getElementById('task-desc').value;
+    const deadline = document.getElementById('task-deadline').value; // Valor del calendario
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!title) return alert("El título es obligatorio");
 
     const { error } = await supabase.from('tasks').insert([
-        { title, description, user_id: user.id }
+        { 
+            title, 
+            description, 
+            user_id: user.id,
+            deadline: deadline || null // Se guarda la fecha elegida
+        }
     ]);
 
     if (error) console.error(error);
     document.getElementById('task-title').value = '';
     document.getElementById('task-desc').value = '';
+    document.getElementById('task-deadline').value = '';
     loadTasks();
 };
 
 async function loadTasks() {
     let query = supabase.from('tasks').select('*').order('created_at', { ascending: false });
-
     const { data: tasks, error } = await query;
     if (error) return console.error(error);
     renderTasks(tasks);
@@ -86,23 +91,48 @@ function renderTasks(tasks) {
     filtered.forEach(task => {
         const div = document.createElement('div');
         div.className = `task-item ${task.completed ? 'completed' : ''}`;
+        
+        // Formatear la fecha del calendario (si existe)
+        const infoCalendario = task.deadline ? `<span>📅 Límite: ${task.deadline}</span>` : '';
+        
+        // Formatear el reloj (hora de completado)
+        let infoReloj = '';
+        if (task.completed && task.completed_at) {
+            const fechaHora = new Date(task.completed_at);
+            const horaHumana = fechaHora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            infoReloj = `<span class="completed-at">🕒 Terminado: ${horaHumana}</span>`;
+        }
+
         div.innerHTML = `
             <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}', ${task.completed})">
             <div class="task-content">
                 <strong class="task-text">${task.title}</strong>
-                <p style="margin:0; font-size: 0.85rem;">${task.description || ''}</p>
+                <p style="margin:0; font-size: 0.85rem; color: #555;">${task.description || ''}</p>
+                <div class="task-meta" style="display: flex; gap: 10px; font-size: 0.75rem; margin-top: 5px; color: #7f8c8d;">
+                    ${infoCalendario}
+                    ${infoReloj}
+                </div>
             </div>
             <div class="task-actions">
-                <button class="btn-delete" onclick="deleteTask('${task.id}')"><i class="fas fa-trash"></i></button>
+                <button class="btn-delete" style="background:none; color:#ef4444; border:none; cursor:pointer;" onclick="deleteTask('${task.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         `;
         tasksList.appendChild(div);
     });
 }
 
-// Funciones globales
+// Funciones globales vinculadas al window para que el HTML las encuentre
 window.toggleTask = async (id, status) => {
-    await supabase.from('tasks').update({ completed: !status }).eq('id', id);
+    // Si la tarea se va a marcar como completada (status actual es false), guardamos la hora actual
+    const timestampCompletado = !status ? new Date().toISOString() : null;
+
+    await supabase.from('tasks').update({ 
+        completed: !status,
+        completed_at: timestampCompletado 
+    }).eq('id', id);
+    
     loadTasks();
 };
 
@@ -131,38 +161,19 @@ window.switchAuth = (type) => {
     document.getElementById('auth-submit-btn').innerText = type === 'login' ? 'Entrar' : 'Registrarse';
 };
 
-// Función para iniciar sesión con GitHub
+// GitHub Login
 async function loginConGitHub() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
-        options: {
-            redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/'
-        }
+        options: { redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/' }
     });
-
-    if (error) {
-        console.error("Error con GitHub:", error.message);
-    }
+    if (error) console.error("Error con GitHub:", error.message);
 }
 
-// Escuchar el clic del nuevo botón
 document.getElementById('github-login').addEventListener('click', loginConGitHub);
 
-// Función para cerrar sesión
-async function cerrarSesion() {
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-        console.error("Error al salir:", error.message);
-    } else {
-        console.log("Sesión cerrada correctamente");
-        // Esto recarga la página para que vuelvas al formulario de entrar
-        window.location.reload(); 
-    }
-}
-
-// Conectar el botón de salir con la función
-const botonSalir = document.getElementById('logout-btn');
-if (botonSalir) {
-    botonSalir.addEventListener('click', cerrarSesion);
-}
+// Salir
+document.getElementById('logout-btn').onclick = async () => {
+    await supabase.auth.signOut();
+    window.location.reload(); 
+};

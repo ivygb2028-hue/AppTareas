@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudTask - Tu App de Tareas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="stylesTareas.css">
+</head>
+<body>
+
+    <div id="auth-section" class="auth-container">
+        <div class="auth-tabs">
+    <span id="tab-login" class="active" onclick="switchAuth('login')">Entrar</span>
+    <span id="tab-signup" onclick="switchAuth('signup')">Registro</span>
+</div>
+        <form id="auth-form">
+            <input type="email" id="auth-email" placeholder="Correo electrónico" required>
+            <input type="password" id="auth-password" placeholder="Contraseña" required>
+            <button type="submit" id="auth-submit-btn" style="width: 100%;">Entrar</button>
+        </form>
+        <button class="btn-github" id="github-login" style="background-color: #333; color: white; width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+    <i class="fab fa-github"></i> Continuar con GitHub
+</button>
+    </div>
+
+    <div id="app-section" class="hidden">
+        <header>
+            <h2>Mis Tareas</h2>
+            <div>
+                <span id="user-display"></span>
+                <button class="btn-logout" id="logout-btn">Salir</button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="task-input-card">
+                <input type="text" id="task-title" placeholder="¿Qué hay que hacer? (Título obligatorio)" required>
+                <textarea id="task-desc" placeholder="Descripción (opcional)"></textarea>
+                <button id="add-task-btn">Añadir Tarea</button>
+            </div>
+
+            <input type="text" id="search-input" placeholder="🔍 Buscar por título...">
+            <div class="controls">
+                <div class="filters">
+                    <button class="active" data-filter="all">Todas</button>
+                    <button data-filter="pending">Pendientes</button>
+                    <button data-filter="completed">Completadas</button>
+                </div>
+            </div>
+
+            <div id="tasks-list">
+                </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
