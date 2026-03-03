@@ -1,6 +1,6 @@
 // 1. CONFIGURACIÓN DE SUPABASE (REMPLAZA CON TUS DATOS)
-const supabaseUrl = 'https://TU_URL_DE_SUPABASE.supabase.co';
-const supabaseKey = 'TU_ANON_KEY_DE_SUPABASE';
+const supabaseUrl = 'https://fwuihjoenbkjahfhjqjx.supabase.co';
+const supabaseKey = 'sb_publishable_9KpL6nw7FWURpbvEsaqvMw_gpqjtGMB';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // VARIABLES DE ESTADO
@@ -192,3 +192,4 @@ document.querySelectorAll('.filters button').forEach(btn => {
 document.getElementById('search-input')?.addEventListener('input', () => {
     loadTasks();
 });
+
