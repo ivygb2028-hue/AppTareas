@@ -1,84 +1,150 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+// 1. CONFIGURACIÓN DE SUPABASE (REMPLAZA CON TUS DATOS)
+const supabaseUrl = 'https://TU_URL_DE_SUPABASE.supabase.co';
+const supabaseKey = 'TU_ANON_KEY_DE_SUPABASE';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-const SUPABASE_URL = 'https://fwuihjoenbkjahfhjqjx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_9KpL6nw7FWURpbvEsaqvMw_gpqjtGMB';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// VARIABLES DE ESTADO
+let currentFilter = 'all';
+let currentUser = null;
 
 // ELEMENTOS DEL DOM
 const authSection = document.getElementById('auth-section');
 const appSection = document.getElementById('app-section');
 const authForm = document.getElementById('auth-form');
 const tasksList = document.getElementById('tasks-list');
-let currentFilter = 'all';
+const userDisplay = document.getElementById('user-display');
 
-// --- 1. GESTIÓN DE AUTENTICACIÓN ---
+// --- 2. GESTIÓN DE USUARIOS (LOGIN/LOGOUT) ---
 
+// Cambiar entre pestañas de Entrar y Registro
+window.switchAuth = (mode) => {
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+
+    if (mode === 'login') {
+        submitBtn.innerText = 'Entrar';
+        tabLogin.classList.add('active');
+        tabSignup.classList.remove('active');
+        authForm.dataset.mode = 'login';
+    } else {
+        submitBtn.innerText = 'Registrarse';
+        tabSignup.classList.add('active');
+        tabLogin.classList.remove('active');
+        authForm.dataset.mode = 'signup';
+    }
+};
+
+// Manejar el envío del formulario de Auth
+authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const mode = authForm.dataset.mode || 'login';
+
+    if (mode === 'signup') {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) alert("Error registro: " + error.message);
+        else alert("¡Registro exitoso! Ya puedes entrar.");
+    } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) alert("Error login: " + error.message);
+    }
+});
+
+// Botón de GitHub
+document.getElementById('github-login').addEventListener('click', async () => {
+    await supabase.auth.signInWithOAuth({ provider: 'github' });
+});
+
+// Botón Salir
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+});
+
+// Detectar cambios en la sesión
 supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
+        currentUser = session.user;
         authSection.classList.add('hidden');
         appSection.classList.remove('hidden');
-        document.getElementById('user-display').innerText = session.user.email;
+        if(userDisplay) userDisplay.innerText = currentUser.email;
         loadTasks();
     } else {
+        currentUser = null;
         authSection.classList.remove('hidden');
         appSection.classList.add('hidden');
     }
 });
 
-authForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const isLogin = document.getElementById('tab-login').classList.contains('active');
+// --- 3. GESTIÓN DE TAREAS (CRUD) ---
 
-    if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) alert(error.message);
-    } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) alert("Revisa tu correo para confirmar el registro");
-    }
-});
+// Cargar tareas desde Supabase
+async function loadTasks() {
+    if (!currentUser) return;
+    const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
 
-document.getElementById('logout-btn').onclick = () => supabase.auth.signOut();
+    if (error) console.error("Error cargando:", error);
+    else renderTasks(data);
+}
 
-// --- 2. GESTIÓN DE TAREAS (CRUD) ---
-
-document.getElementById('add-task-btn').onclick = async () => {
+// Añadir nueva tarea
+document.getElementById('add-task-btn').addEventListener('click', async () => {
     const title = document.getElementById('task-title').value;
-    const description = document.getElementById('task-desc').value;
-    const deadline = document.getElementById('task-deadline').value; // Valor del calendario
-    const { data: { user } } = await supabase.auth.getUser();
+    const desc = document.getElementById('task-desc').value;
+    const deadline = document.getElementById('task-deadline').value;
 
     if (!title) return alert("El título es obligatorio");
 
     const { error } = await supabase.from('tasks').insert([
         { 
             title, 
-            description, 
-            user_id: user.id,
-            deadline: deadline || null // Se guarda la fecha elegida
+            description: desc, 
+            deadline: deadline || null,
+            user_id: currentUser.id,
+            completed: false
         }
     ]);
 
+    if (error) alert("Error: " + error.message);
+    else {
+        document.getElementById('task-title').value = '';
+        document.getElementById('task-desc').value = '';
+        document.getElementById('task-deadline').value = '';
+        loadTasks();
+    }
+});
+
+// Borrar tarea
+window.deleteTask = async (id) => {
+    if (confirm("¿Borrar esta tarea?")) {
+        const { error } = await supabase.from('tasks').delete().eq('id', id);
+        if (error) console.error(error);
+        loadTasks();
+    }
+};
+
+// Cambiar estado (Checkbox) y GUARDAR RELOJ
+window.toggleTask = async (id, status) => {
+    const ahora = !status ? new Date().toISOString() : null;
+
+    const { error } = await supabase.from('tasks').update({ 
+        completed: !status,
+        completed_at: ahora 
+    }).eq('id', id);
+    
     if (error) console.error(error);
-    document.getElementById('task-title').value = '';
-    document.getElementById('task-desc').value = '';
-    document.getElementById('task-deadline').value = '';
     loadTasks();
 };
 
-async function loadTasks() {
-    let query = supabase.from('tasks').select('*').order('created_at', { ascending: false });
-    const { data: tasks, error } = await query;
-    if (error) return console.error(error);
-    renderTasks(tasks);
-}
-
-// --- 3. UI Y FILTROS ---
+// --- 4. RENDERIZADO Y FILTROS ---
 
 function renderTasks(tasks) {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
     tasksList.innerHTML = '';
 
     const filtered = tasks.filter(t => {
@@ -91,89 +157,38 @@ function renderTasks(tasks) {
     filtered.forEach(task => {
         const div = document.createElement('div');
         div.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+        const infoCalendario = task.deadline ? `<span><i class="far fa-calendar-alt"></i> ${task.deadline}</span>` : '';
         
-        // Formatear la fecha del calendario (si existe)
-        const infoCalendario = task.deadline ? `<span>📅 Límite: ${task.deadline}</span>` : '';
-        
-        // Formatear el reloj (hora de completado)
         let infoReloj = '';
         if (task.completed && task.completed_at) {
-            const fechaHora = new Date(task.completed_at);
-            const horaHumana = fechaHora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            infoReloj = `<span class="completed-at">🕒 Terminado: ${horaHumana}</span>`;
+            const hora = new Date(task.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            infoReloj = `<span class="completed-at"><i class="far fa-clock"></i> Terminado: ${hora}</span>`;
         }
 
         div.innerHTML = `
             <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}', ${task.completed})">
             <div class="task-content">
                 <strong class="task-text">${task.title}</strong>
-                <p style="margin:0; font-size: 0.85rem; color: #555;">${task.description || ''}</p>
-                <div class="task-meta" style="display: flex; gap: 10px; font-size: 0.75rem; margin-top: 5px; color: #7f8c8d;">
-                    ${infoCalendario}
-                    ${infoReloj}
-                </div>
+                <div class="task-meta">${infoCalendario} ${infoReloj}</div>
             </div>
-            <div class="task-actions">
-                <button class="btn-delete" style="background:none; color:#ef4444; border:none; cursor:pointer;" onclick="deleteTask('${task.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
+            <button class="btn-delete" onclick="deleteTask('${task.id}')"><i class="fas fa-trash"></i></button>
         `;
         tasksList.appendChild(div);
     });
 }
 
-// Funciones globales vinculadas al window para que el HTML las encuentre
-window.toggleTask = async (id, status) => {
-    // Si la tarea se va a marcar como completada (status actual es false), guardamos la hora actual
-    const timestampCompletado = !status ? new Date().toISOString() : null;
-
-    await supabase.from('tasks').update({ 
-        completed: !status,
-        completed_at: timestampCompletado 
-    }).eq('id', id);
-    
-    loadTasks();
-};
-
-window.deleteTask = async (id) => {
-    if(confirm('¿Borrar tarea?')) {
-        await supabase.from('tasks').delete().eq('id', id);
-        loadTasks();
-    }
-};
-
-// Eventos de Filtros
+// Filtros
 document.querySelectorAll('.filters button').forEach(btn => {
-    btn.onclick = (e) => {
+    btn.addEventListener('click', () => {
         document.querySelector('.filters button.active').classList.remove('active');
-        e.target.classList.add('active');
-        currentFilter = e.target.dataset.filter;
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
         loadTasks();
-    };
+    });
 });
 
-document.getElementById('search-input').oninput = () => loadTasks();
-
-window.switchAuth = (type) => {
-    document.getElementById('tab-login').classList.toggle('active', type === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', type === 'signup');
-    document.getElementById('auth-submit-btn').innerText = type === 'login' ? 'Entrar' : 'Registrarse';
-};
-
-// GitHub Login
-async function loginConGitHub() {
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: { redirectTo: 'https://ivygb2028-hue.github.io/AppTareas/' }
-    });
-    if (error) console.error("Error con GitHub:", error.message);
-}
-
-document.getElementById('github-login').addEventListener('click', loginConGitHub);
-
-// Salir
-document.getElementById('logout-btn').onclick = async () => {
-    await supabase.auth.signOut();
-    window.location.reload(); 
-};
+// Buscador en tiempo real
+document.getElementById('search-input')?.addEventListener('input', () => {
+    loadTasks();
+});
