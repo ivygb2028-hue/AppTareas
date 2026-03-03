@@ -1,8 +1,7 @@
-// 1. CONFIGURACIÓN DE SUPABASE (REMPLAZA CON TUS DATOS)
+// 1. CONFIGURACIÓN DE SUPABASE
 const supabaseUrl = 'https://fwuihjoenbkjahfhjqjx.supabase.co';
 const supabaseKey = 'sb_publishable_9KpL6nw7FWURpbvEsaqvMw_gpqjtGMB';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // VARIABLES DE ESTADO
 let currentFilter = 'all';
 let currentUser = null;
@@ -192,4 +191,5 @@ document.querySelectorAll('.filters button').forEach(btn => {
 document.getElementById('search-input')?.addEventListener('input', () => {
     loadTasks();
 });
+
 
