@@ -1,38 +1,36 @@
-/* --- VARIABLES Y BASES --- */
+/* --- VARIABLES --- */
 :root {
-    --primary: #9b59b6;    /* Lila */
-    --bg: #ffe0f0;         /* Rosa Pastel */
+    --primary: #9b59b6;
+    --bg: #ffe0f0;
     --card: #ffffff;
     --text: #1e293b;
-    --danger: #ef4444;     /* Rojo para Salir/Borrar */
-    --header-bg: #e0f2fe;  /* Azul Tenue */
-    --success: #10b981;    /* Verde para el Reloj */
+    --danger: #ef4444;
+    --header-bg: #e0f2fe;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     margin: 0;
-    padding: 0;
 }
 
 .hidden { display: none !important; }
 
-/* --- PANTALLA DE LOGIN (AUTH) --- */
+/* --- PANTALLA LOGIN (AUTH) --- */
 .auth-container {
-    max-width: 380px;
+    max-width: 400px;
     margin: 80px auto;
     padding: 2.5rem;
-    background: var(--card);
+    background: white;
     border-radius: 20px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    text-align: center;
 }
 
+/* Pestañas: UNA AL LADO DE LA OTRA */
 .auth-tabs {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 25px;
 }
 
@@ -41,7 +39,7 @@ body {
     padding: 12px;
     text-align: center;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 2px solid var(--primary);
     color: var(--primary);
     font-weight: bold;
@@ -53,39 +51,160 @@ body {
     color: white;
 }
 
-/* --- HEADER --- */
+/* Campos y Botones: UNO DEBAJO DEL OTRO */
+#auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#auth-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+#auth-submit-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* BOTÓN GITHUB NEGRO */
+.btn-github {
+    background-color: #000000 !important;
+    color: white !important;
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- HEADER (BOTÓN SALIR ROJO) --- */
 header {
     background: var(--header-bg);
     padding: 1rem 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #bae6fd;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-header h2 {
-    margin: 0;
-    color: var(--primary);
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    border-bottom: 1px solid #bae6fd;
 }
 
 .btn-logout {
     background: var(--danger) !important;
     color: white !important;
     border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: bold;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
     cursor: pointer;
-    transition: 0.2s;
+    font-weight: bold;
 }
 
-.btn-logout:hover {
-    transform: scale(1.05);
-    filter:
+/* --- CONTENEDOR DE TAREAS --- */
+.container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.task-input-card {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.date-group {
+    margin: 5px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.date-group label {
+    font-weight: bold;
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+#add-task-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Filtros en columna como pediste antes */
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.filters button {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.filters button.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* --- TAREAS --- */
+.task-item {
+    background: var(--card);
+    padding: 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 5px solid var(--primary);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.task-content { flex: 1; }
+
+.task-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+.completed-at { color: #10b981; font-weight: bold; }
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
