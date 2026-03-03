@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudTask - Tu App de Tareas</title>
-    <link rel="icon" type="image/png" href="icono.png">
+    <title>CloudTask - Mi App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="stylesTareas.css">
 </head>
@@ -15,58 +14,43 @@
             <span id="tab-login" class="active" onclick="switchAuth('login')">Entrar</span>
             <span id="tab-signup" onclick="switchAuth('signup')">Registro</span>
         </div>
-
         <form id="auth-form">
-            <input type="email" id="auth-email" placeholder="Correo electrónico" required>
+            <input type="email" id="auth-email" placeholder="Correo" required>
             <input type="password" id="auth-password" placeholder="Contraseña" required>
             <button type="submit" id="auth-submit-btn">Entrar</button>
         </form>
-
         <button class="btn-github" id="github-login">
-            <i class="fab fa-github"></i> Continuar con GitHub
+            <i class="fab fa-github"></i> Entrar con GitHub
         </button>
     </div>
 
     <div id="app-section" class="hidden">
         <header>
-            <h2><i class="fas fa-tasks"></i> Mis Tareas</h2>
-            <div class="header-right">
-                <span id="user-display"></span>
-                <button class="btn-logout" id="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </button>
-            </div>
+            <h2><i class="fas fa-clipboard-list"></i> Mis Tareas</h2>
+            <button class="btn-logout" id="logout-btn">Salir</button>
         </header>
 
         <div class="container">
             <div class="task-input-card">
-                <input type="text" id="task-title" placeholder="¿Qué hay que hacer? (Título obligatorio)" required>
-                <textarea id="task-desc" placeholder="Descripción (opcional)"></textarea>
-                
+                <input type="text" id="task-title" placeholder="Título de la tarea" required>
+                <textarea id="task-desc" placeholder="Descripción..."></textarea>
                 <div class="date-group">
-                    <label for="task-deadline">
-                        <i class="far fa-calendar-alt"></i> Fecha límite:
-                    </label>
+                    <label>📅 Fecha Límite:</label>
                     <input type="date" id="task-deadline">
                 </div>
-
                 <button id="add-task-btn">Añadir Tarea</button>
             </div>
 
             <div class="search-section">
-                <input type="text" id="search-input" placeholder="🔍 Buscar por título...">
-                
-                <div class="controls">
-                    <div class="filters">
-                        <button class="active" data-filter="all">Todas</button>
-                        <button data-filter="pending">Pendientes</button>
-                        <button data-filter="completed">Completadas</button>
-                    </div>
+                <input type="text" id="search-input" placeholder="Buscar tarea...">
+                <div class="filters">
+                    <button class="active" data-filter="all">Todas</button>
+                    <button data-filter="pending">Pendientes</button>
+                    <button data-filter="completed">Completadas</button>
                 </div>
             </div>
 
-            <div id="tasks-list">
-                </div>
+            <div id="tasks-list"></div>
         </div>
     </div>
 
